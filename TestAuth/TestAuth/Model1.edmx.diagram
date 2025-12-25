@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="a58ee7e750d941f695dbd04990c81488" Name="Diagram1">
+        <EntityTypeShape EntityType="MedicalLabModel.analyzer_logs" Width="1.5" PointX="7.5" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.analyzers" Width="1.5" PointX="3" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.archive_log" Width="1.5" PointX="3.75" PointY="19.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.blood" Width="1.5" PointX="3" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.bloodservice" Width="1.5" PointX="5.25" PointY="6.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.employee_roles" Width="1.5" PointX="1.5" PointY="23.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.employee_services" Width="1.5" PointX="5.25" PointY="24.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.employees" Width="1.5" PointX="1.5" PointY="18.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.insurance_companies" Width="1.5" PointX="1.5" PointY="26.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.invoices" Width="1.5" PointX="0.75" PointY="13.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.order_services" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.order_statuses" Width="1.5" PointX="0.75" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.orders" Width="1.5" PointX="3" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.patients" Width="1.5" PointX="0.75" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.service_statuses" Width="1.5" PointX="3" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.services" Width="1.5" PointX="3" PointY="30.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="MedicalLabModel.sysdiagrams" Width="1.5" PointX="7.75" PointY="5.375" IsExpanded="true" />
+        <AssociationConnector Association="MedicalLabModel.FK__analyzer___analy__4CA06362" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__analyzer___order__4D94879B" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__analy__49C3F6B7" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__archive_l__archi__5BE2A6F2" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__blood__patient__5FB337D6" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__bloodserv__blood__656C112C" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__bloodserv__user___66603565" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__employees__role___3B75D760" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__employee___emplo__6A30C649" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__employee___servi__6B24EA82" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__invoices__create__5441852A" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__assig__47DBAE45" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__perfo__48CFD27E" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__invoices__insura__534D60F1" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__order__44FF419A" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__servi__45F365D3" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__order_ser__statu__46E78A0C" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__orders__status_i__4222D4EF" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.FK__orders__patient___412EB0B6" ManuallyRouted="false" />
+        <AssociationConnector Association="MedicalLabModel.invoice_orders" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
