@@ -1,0 +1,120 @@
+using System;
+using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
+using System.Windows;
+
+namespace TestAuth
+{
+    public partial class MainWindow : Window
+    {
+        SqlConnection conn = new SqlConnection(
+            @"Server=localhost\SQLEXPRESS;Database=gorgo;Trusted_Connection=True;");
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            conn.Open();
+        }
+
+        private void Login_Click(object sender, RoutedEventArgs e)
+        {
+            string login = txtLogin.Text;
+            string pass = txtPass.Password;
+
+            // Проверяем логин и пароль
+            bool found = false;
+            bool isAdmin = false;
+            bool isBlocked = false;
+
+            using (var cmd = new SqlCommand(
+                "SELECT is_admin, blocked FROM users WHERE login=@l AND pass=@p",
+                conn))
+            {
+                cmd.Parameters.AddWithValue("@l", login);
+                cmd.Parameters.AddWithValue("@p", pass);
+
+                using (var r = cmd.ExecuteReader())
+                {
+                    if (r.Read())
+                    {
+                        found = true;
+                        isAdmin = (bool)r["is_admin"];
+                        isBlocked = (bool)r["blocked"];
+                    }
+                }
+            }
+
+            if (found) // Успешный вход
+            {
+                if (isBlocked)
+                {
+                    MessageBox.Show("Аккаунт заблокирован!");
+                    return;
+                }
+
+                // Сбрасываем ошибки
+                using (var cmd = new SqlCommand(
+                    "UPDATE users SET errors=0 WHERE login=@l", conn))
+                {
+                    cmd.Parameters.AddWithValue("@l", login);
+                    cmd.ExecuteNonQuery();
+                }
+
+                MessageBox.Show($"Успех! {(isAdmin ? "Админ" : "Юзер")}");
+                if (isAdmin) ShowAdmin();
+            }
+            else // Неправильный логин/пароль
+            {
+                // Увеличиваем счетчик ошибок
+                using (var cmd = new SqlCommand(
+                    "UPDATE users SET errors=errors+1 WHERE login=@l", conn))
+                {
+                    cmd.Parameters.AddWithValue("@l", login);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Проверяем количество ошибок
+                int errors = 0;
+                using (var cmd = new SqlCommand(
+                    "SELECT errors FROM users WHERE login=@l", conn))
+                {
+                    cmd.Parameters.AddWithValue("@l", login);
+                    var result = cmd.ExecuteScalar();
+                    errors = result != null ? (int)result : 0;
+                }
+
+                if (errors >= 3)
+                {
+                    using (var cmd = new SqlCommand(
+                        "UPDATE users SET blocked=1 WHERE login=@l", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@l", login);
+                        cmd.ExecuteNonQuery();
+                    }
+                    MessageBox.Show("Блокировка после 3 ошибок!");
+                }
+                else
+                {
+                    MessageBox.Show($"Ошибка! Попыток осталось: {3 - errors}");
+                }
+            }
+        }
+
+        void ShowAdmin()
+        {
+            var win = new Window { Title = "Админка", Width = 250, Height = 200 };
+            var list = new System.Windows.Controls.ListBox();
+
+            using (var cmd = new SqlCommand("SELECT login, blocked FROM users", conn))
+            using (var r = cmd.ExecuteReader())
+            {
+                while (r.Read())
+                    list.Items.Add($"{r["login"]} {(r["blocked"] as bool? == true ? "(заблок.)" : "(активен)")}");
+            }
+
+            win.Content = list;
+            win.ShowDialog();
+        }
+    }
+}
