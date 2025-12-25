@@ -1,0 +1,255 @@
+-- ============================================
+-- ПОЛНАЯ БАЗА ДАННЫХ СО ВСЕМИ ТАБЛИЦАМИ ИЗ ТЗ
+-- ============================================
+
+-- 1. Создание базы данных
+CREATE DATABASE MedicalLab;
+GO
+
+USE MedicalLab;
+GO
+
+-- 2. Таблица статусов заказов
+CREATE TABLE order_statuses (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    status_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+GO
+
+-- 3. Таблица статусов услуг
+CREATE TABLE service_statuses (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    status_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+GO
+
+-- 4. Таблица ролей сотрудников
+CREATE TABLE employee_roles (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    role_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255)
+);
+GO
+
+-- 5. Таблица страховых компаний
+CREATE TABLE insurance_companies (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    company_name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    inn VARCHAR(20) UNIQUE NOT NULL,
+    checking_account VARCHAR(30),
+    bik VARCHAR(20),
+    phone VARCHAR(20),
+    email VARCHAR(100)
+);
+GO
+
+-- 6. Таблица пациентов (ТВОЙ ФОРМАТ)
+CREATE TABLE patients (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    full_name VARCHAR(100) NOT NULL,
+    login VARCHAR(50),
+    pwd VARCHAR(255),
+    guid UNIQUEIDENTIFIER DEFAULT NEWID(),
+    email VARCHAR(100),
+    social_sec_number VARCHAR(50),
+    ein VARCHAR(20),
+    social_type VARCHAR(50),
+    phone VARCHAR(20) NOT NULL,
+    passport_s VARCHAR(10),
+    passport_n VARCHAR(20),
+    birthdate_timestamp DATETIME NOT NULL,
+    country VARCHAR(50),
+    insurance_name VARCHAR(100),
+    insurance_address VARCHAR(255),
+    insurance_inn VARCHAR(20),
+    ipadress VARCHAR(45),
+    insurance_p_c VARCHAR(20),
+    insurance_bik VARCHAR(20),
+    ua VARCHAR(255)
+);
+GO
+
+-- 7. Таблица услуг лаборатории
+CREATE TABLE services (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    service_code VARCHAR(20) UNIQUE NOT NULL,
+    service_name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    execution_days INT NOT NULL DEFAULT 1,
+    average_deviation DECIMAL(5,2)
+);
+GO
+
+-- 8. Таблица анализаторов
+CREATE TABLE analyzers (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    analyzer_code VARCHAR(50) UNIQUE NOT NULL,
+    analyzer_name VARCHAR(100) NOT NULL,
+    model VARCHAR(50),
+    location VARCHAR(100)
+);
+GO
+
+-- 9. Таблица сотрудников (лаборанты, бухгалтеры, администраторы)
+CREATE TABLE employees (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    full_name VARCHAR(100) NOT NULL,
+    login VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role_id INT NOT NULL,
+    phone VARCHAR(20),
+    email VARCHAR(100),
+    department VARCHAR(50),
+    last_login DATETIME,
+    FOREIGN KEY (role_id) REFERENCES employee_roles(id)
+);
+GO
+
+-- 10. Таблица заказов
+CREATE TABLE [orders] (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    order_number VARCHAR(50) UNIQUE NOT NULL,
+    patient_id INT NOT NULL,
+    order_date DATETIME NOT NULL DEFAULT GETDATE(),
+    status_id INT NOT NULL,
+    total_amount DECIMAL(10,2) DEFAULT 0,
+    execution_days INT,
+    FOREIGN KEY (patient_id) REFERENCES patients(id),
+    FOREIGN KEY (status_id) REFERENCES order_statuses(id)
+);
+GO
+
+-- 11. Таблица услуг в заказе
+CREATE TABLE order_services (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    order_id INT NOT NULL,
+    service_id INT NOT NULL,
+    status_id INT NOT NULL,
+    assigned_to INT,
+    performed_by INT,
+    analyzer_id INT,
+    result TEXT,
+    actual_price DECIMAL(10,2),
+    FOREIGN KEY (order_id) REFERENCES [orders](id),
+    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (status_id) REFERENCES service_statuses(id),
+    FOREIGN KEY (assigned_to) REFERENCES employees(id),
+    FOREIGN KEY (performed_by) REFERENCES employees(id),
+    FOREIGN KEY (analyzer_id) REFERENCES analyzers(id)
+);
+GO
+
+-- 12. Таблица логов анализаторов
+CREATE TABLE analyzer_logs (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    analyzer_id INT NOT NULL,
+    order_service_id INT NOT NULL,
+    started_at DATETIME NOT NULL,
+    completed_at DATETIME,
+    duration_seconds INT,
+    FOREIGN KEY (analyzer_id) REFERENCES analyzers(id),
+    FOREIGN KEY (order_service_id) REFERENCES order_services(id)
+);
+GO
+
+-- 13. Таблица счетов
+CREATE TABLE invoices (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    invoice_number VARCHAR(50) UNIQUE NOT NULL,
+    insurance_company_id INT NOT NULL,
+    invoice_date DATE NOT NULL DEFAULT GETDATE(),
+    total_amount DECIMAL(10,2) NOT NULL,
+    due_date DATE,
+    is_paid BIT DEFAULT 0,
+    created_by INT NOT NULL,
+    FOREIGN KEY (insurance_company_id) REFERENCES insurance_companies(id),
+    FOREIGN KEY (created_by) REFERENCES employees(id)
+);
+GO
+
+-- 14. Таблица связи счет-заказ
+CREATE TABLE invoice_orders (
+    invoice_id INT NOT NULL,
+    order_id INT NOT NULL,
+    PRIMARY KEY (invoice_id, order_id),
+    FOREIGN KEY (invoice_id) REFERENCES invoices(id),
+    FOREIGN KEY (order_id) REFERENCES [orders](id)
+);
+GO
+
+-- 15. Таблица архивного лога
+CREATE TABLE archive_log (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    table_name VARCHAR(50) NOT NULL,
+    record_id INT NOT NULL,
+    archived_by INT,
+    archive_reason VARCHAR(255),
+    original_data TEXT,
+    archived_at DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (archived_by) REFERENCES employees(id)
+);
+GO
+
+-- 16. ТАБЛИЦА BLOOD (из твоего списка)
+CREATE TABLE blood (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    patient INT NOT NULL,
+    barcode VARCHAR(50) NOT NULL,
+    date DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (patient) REFERENCES patients(id)
+);
+GO
+
+-- 17. ТАБЛИЦА BLOODSERVICE (из твоего списка)
+CREATE TABLE bloodservice (
+    id INT PRIMARY KEY IDENTITY(1,1),
+    blood_id INT NOT NULL,
+    service_code VARCHAR(20) NOT NULL,
+    result TEXT,
+    finished BIT DEFAULT 0,
+    accepted BIT DEFAULT 0,
+    status VARCHAR(30) DEFAULT 'pending',
+    analyzer VARCHAR(50),
+    user_id INT,
+    FOREIGN KEY (blood_id) REFERENCES blood(id),
+    FOREIGN KEY (user_id) REFERENCES employees(id)
+);
+GO
+
+-- 18. Таблица связи сотрудник-услуга
+CREATE TABLE employee_services (
+    employee_id INT NOT NULL,
+    service_id INT NOT NULL,
+    is_primary BIT DEFAULT 1,
+    PRIMARY KEY (employee_id, service_id),
+    FOREIGN KEY (employee_id) REFERENCES employees(id),
+    FOREIGN KEY (service_id) REFERENCES services(id)
+);
+GO
+
+-- ============================================
+-- СОЗДАНИЕ ИНДЕКСОВ
+-- ============================================
+CREATE INDEX idx_patients_login ON patients(login);
+CREATE INDEX idx_patients_phone ON patients(phone);
+CREATE INDEX idx_employees_login ON employees(login);
+CREATE INDEX idx_orders_number ON [orders](order_number);
+CREATE INDEX idx_orders_patient ON [orders](patient_id);
+CREATE INDEX idx_orders_status ON [orders](status_id);
+CREATE INDEX idx_blood_patient ON blood(patient);
+CREATE INDEX idx_blood_barcode ON blood(barcode);
+CREATE INDEX idx_bloodservice_blood ON bloodservice(blood_id);
+CREATE INDEX idx_bloodservice_status ON bloodservice(status);
+CREATE INDEX idx_invoices_number ON invoices(invoice_number);
+CREATE INDEX idx_invoices_company ON invoices(insurance_company_id);
+GO
+
+-- ============================================
+-- ПРОВЕРКА СОЗДАНИЯ
+-- ============================================
+SELECT 'База данных создана успешно!' as message;
+SELECT name as table_name FROM sys.tables ORDER BY name;
+GO
