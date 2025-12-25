@@ -1,0 +1,1 @@
+SELECT o.*, p.full_name, s.status_name FROM orders o JOIN patients p ON o.patient_id = p.id JOIN order_statuses s ON o.status_id = s.id WHERE s.status_name = 'Новый';

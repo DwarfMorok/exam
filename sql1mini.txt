@@ -1,0 +1,1 @@
+SELECT p.*, (SELECT COUNT(*) FROM orders WHERE patient_id = p.id) as orders FROM patients p WHERE p.id = 1;
