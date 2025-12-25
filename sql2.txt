@@ -1,0 +1,18 @@
+SELECT 
+    o.order_number,
+    p.full_name,
+    o.order_date,
+    o.total_amount
+FROM orders o
+JOIN patients p ON o.patient_id = p.id
+WHERE o.status_id = 1; -- статус "Новый"
+
+SELECT 
+    s.status_name,
+    COUNT(o.id) as count
+FROM order_statuses s
+LEFT JOIN orders o ON s.id = o.status_id
+GROUP BY s.status_name;
+
+SELECT * FROM orders 
+WHERE CAST(order_date AS DATE) = CAST(GETDATE() AS DATE);

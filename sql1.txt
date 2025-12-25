@@ -1,24 +1,11 @@
--- Полная информация о пациенте
-CREATE VIEW patient_info AS
+SELECT * FROM patients WHERE id = 234;
+
 SELECT 
-    p.id,
-    p.full_name,
-    p.birth_date,
-    p.phone,
-    p.email,
-    p.insurance_policy_number,
-    ic.company_name as insurance_company,
-    COUNT(o.id) as order_count,
-    SUM(o.total_amount) as total_spent
-FROM patients p
-LEFT JOIN insurance_companies ic ON p.insurance_company_id = ic.id
-LEFT JOIN orders o ON p.id = o.patient_id
-WHERE p.is_archived = 0
-GROUP BY 
-    p.id,
-    p.full_name,
-    p.birth_date,
-    p.phone,
-    p.email,
-    p.insurance_policy_number,
-    ic.company_name;
+    p.*,
+    (SELECT COUNT(*) FROM orders WHERE patient_id = p.id) as orders_count
+FROM patients p 
+WHERE p.id = 1;
+
+-- Поиск пациента
+SELECT * FROM patients 
+WHERE full_name LIKE '%Иванов%' OR phone LIKE '%123%';
